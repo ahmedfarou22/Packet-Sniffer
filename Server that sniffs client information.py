@@ -7,7 +7,7 @@ serversocket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 s = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
 
 # get local machine name
-host = socket.gethostname()                           
+host = '172.19.0.10'                           
 port = 9999                                           
 
 # bind to the port
@@ -27,26 +27,36 @@ while True:
 
 def main():
     while True:
-        raww, addr =s.recvfrom(65536) 
-        dest_mac , src_mac, prototype, raw_data = ethernet_head(raww) # layer 2 mac info
-        ( versiion, header_length, time_to_live, proto,src,target, data) = ipv4_head(raw_data) # ip header layer 3 info
-        (src_port,dest_port, sequence, acknowledgement, flag_urg, flag_ack, flag_puh, flag_rst, flag_syn, flag_fin, dataaa) = tcp_segment(data)
+        raww, addr =s.recvfrom(65536)
+        dest_mac , src_mac, prototype, raw_data = ethernet_head(raww)
         
-        if dest_port == 9999:
-            print('\n Layer 2,3,4 Information ')
-            print("     -->  Destination MAC : "+ str(dest_mac))
-            print("     -->  Sorcue MAC : " + str(src_mac))
-            print("     -->  Source IP : " + str(target))
-            print("     -->  Destination IP: " + str(src))
-            print("     -->  Source Port : " + str(src_port))
-            print("     -->  Destination Port: " + str(dest_port))
-            print("     -->  Protocol : "+ "TCP")
-            break
-        
-
+        if prototype == 8:
+            ( versiion, header_length, time_to_live, proto,src,target, data) = ipv4_head(raw_data)
+            if proto == 6:
+                (src_port,dest_port, sequence, acknowledgement, flag_urg, flag_ack, flag_puh, flag_rst, flag_syn, flag_fin, dataaa) = tcp_segment(data)
+                if dest_port == 9999:
+                    print("     -->  Destination MAC : "+ str(dest_mac))
+                    print("    -->  Sorcue MAC : " + str(src_mac) )
+                    print("     -->  Source IP : " + str(target))
+                    print("     -->  Destination IP: " + str(src))
+                    print("     -->  Source Port : " + str(src_port))
+                    print("     -->  Destination Port: " + str(dest_port))
+                    print("this is a tcp Message")
+                    break
+            
+            if proto == 17:
+                (udp_src_port, udp_dest_port, size, rest_data) = udp_segment(data)
+                if udp_dest_port == 9999:
+                    print("     -->  Destination MAC : "+ str(dest_mac))
+                    print("     -->  Sorcue MAC : " + str(src_mac))
+                    print("     -->  Source IP : " + str(target))
+                    print("     -->  Destination IP: " + str(src))
+                    print("     -->  Source Port : " + str(udp_src_port))
+                    print("     -->  Destination Port: " + str(udp_dest_port))
+                    print("this is a udp Message")
+                    break         	
 
             
-
 
                 
 # unpack and extract the data from ethernet fram layer 2
@@ -82,5 +92,13 @@ def tcp_segment(data):
     flag_syn = (offset_reserved_flags & 2) >> 1
     flag_fin = offset_reserved_flags & 1
     return src_port,dest_port, sequence, acknowledgement, flag_urg, flag_ack, flag_puh, flag_rst, flag_syn, flag_fin, data[offset:]
+
+#unpakc UDP
+def udp_segment(data):
+    udp_src_port, udp_dest_port, size = struct.unpack('! H H 2x H', data[:8])
+    return udp_src_port, udp_dest_port, size, data[8:]
+
+
+
 
 main()
