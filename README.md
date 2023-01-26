@@ -1,4 +1,4 @@
-# Packet-Sniffer
+# Packet Sniffer
 Welcome to my Python Packet Sniffer! This is a command line tool built using Python from scratch that allows you to capture and analyze network traffic. It uses the raw sockets provided by the python socket module.
 
 This packet sniffer provides the ability to capture packets from the network and display the important information such as source and destination IP addresses, source and destination ports, packet size and protocols.
