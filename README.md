@@ -1,2 +1,2 @@
 # Packet-Sniffer
-Repo For Course Work One Networking
+A packet sniffer is a tool that captures and analyzes network traffic. In Python, there are several libraries available for creating a packet sniffer, including Scapy, pyshark, and rawsocket. These libraries allow you to capture and analyze network packets, as well as create custom packet capture and analysis tools. For example, Scapy allows for the manipulation of network packets, including sniffing, sending, and dissecting them. Pyshark is a wrapper for the tshark packet sniffing tool, and rawsocket allows for the creation of raw sockets for capturing and analyzing network traffic at the packet level.
